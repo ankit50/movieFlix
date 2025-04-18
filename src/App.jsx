@@ -4,6 +4,7 @@ import './App.css';
 import Search from './components/Search';
 import Spinner from './components/Spinner';
 import MovieCard from './components/MovieCard';
+import { updateSearchCount } from './appwrite';
 const API_BASE_URL = "https://api.themoviedb.org/3";
 const API_KEY = import.meta.env.VITE_TMDB_KEY;
 const API_OPTIONS = {
@@ -20,9 +21,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [movieList, setMovieList] = useState([]);
   const [deBounceSearchTerm, setDeBounceSearchTerm] = useState('');
-  useDebounce(()=>setDeBounceSearchTerm(serachTerm), 500,[serachTerm]);
-
+  useDebounce(()=>setDeBounceSearchTerm(serachTerm), 1000,[serachTerm]);
   const fetchMovies = async (query = '') => {
+    
     setIsLoading(true);
     setErrorMsg('');
     try {
@@ -39,6 +40,9 @@ function App() {
         setMovieList([]);
       }
       setMovieList(data.results || []);
+      if(query && data.results.length>0){
+        updateSearchCount(query, data.results[0]);
+      }
     } catch (error) {
       console.log("Error loading API:", error);
       setErrorMsg(error);
